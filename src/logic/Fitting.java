@@ -6,17 +6,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public abstract class Fitting {
-    protected Direction[] directions;
-    protected boolean brimful;
-    protected Image image;
-    protected double x;
-    protected double y;
-    protected double imageSize = 60;
+    Direction[] directions;
+    Image image;
+    double x;
+    double y;
+    private double imageSize = 60;
 
-    public Fitting(int iloscOdgalezien) {
+    Fitting(int iloscOdgalezien) {
         this.directions = new Direction[iloscOdgalezien];
-        this.brimful = false;
     }
+
 
     public void rotate(Canvas canvas) {
         for (Direction k : this.directions) {

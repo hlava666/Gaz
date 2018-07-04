@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="420.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="windows.Controller">
    <center>
@@ -21,15 +16,11 @@
             <Button layoutX="5.0" layoutY="5.0" onAction="#newGame" prefWidth="70.0" text="Nowa gra" />
             <Button layoutX="5.0" layoutY="35.0" onAction="#text" prefWidth="70.0" text="INFO" />
             <Button layoutX="5.0" layoutY="65.0" onAction="#exit" prefWidth="70.0" text="Wyjście" />
-            <ProgressBar fx:id="bar" layoutX="-74.0" layoutY="192.0" prefWidth="200.0" progress="0.0" rotate="270.0"  />
+            <ProgressBar fx:id="bar" layoutX="-74.0" layoutY="192.0" prefWidth="200.0" progress="0.0" rotate="270.0" style="-fx-accent: ORANGE;" />
          </children>
       </Pane>
    </left>
    <right>
-      <VBox prefHeight="420.0" prefWidth="120.0" BorderPane.alignment="CENTER">
-         <children>
-            <Canvas fx:id="sideCanvas" height="420.0" onMouseClicked="#mouseClick" width="120.0" />
-         </children>
-      </VBox>
+       <Canvas fx:id="sideCanvas" height="420.0" onMouseClicked="#mouseClick" width="120.0" />
    </right>
 </BorderPane>

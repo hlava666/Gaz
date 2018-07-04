@@ -9,7 +9,7 @@ public class Level {
     private Begining begining;
     private End[] end;
 
-    public Level(int time, Begining begining, End[] end) {
+    Level(int time, Begining begining, End[] end) {
         this.fittings = new ArrayList<>();
         this.time = time;
         this.begining = begining;

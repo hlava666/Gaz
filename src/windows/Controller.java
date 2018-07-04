@@ -17,7 +17,7 @@ public class Controller {
     private Game game;
     private boolean moveFit = false;
     private boolean gameOn = false;
-    private boolean gameOver = false;
+    private boolean gameOver = true;
     private Fitting[][] movingFittings;
     private Fitting temp = null;
 
@@ -42,7 +42,7 @@ public class Controller {
     }
 
     @FXML
-    public void mouseClick(MouseEvent event) throws InterruptedException {
+    public void mouseClick(MouseEvent event) {
         if (!gameOn && !gameOver) {
             if (event.getX() > 50 && event.getX() < 320 && event.getY() > 50 && event.getY() < 320){
                 gameOn = true;
@@ -132,7 +132,7 @@ public class Controller {
                                         box--;
                                     }
                                 }
-                            } else if (d.getSide() == Direction.Side.south && j + 1 <= 7 && movingFittings[i][j + 1] != null) {
+                            } else if (d.getSide() == Direction.Side.south && j + 1 < 7 && movingFittings[i][j + 1] != null) {
                                 for (Direction d2 : movingFittings[i][j + 1].getDirections()) {
                                     if (d2.getSide() == Direction.Side.north) {
                                         box--;
@@ -144,7 +144,7 @@ public class Controller {
                                         box--;
                                     }
                                 }
-                            } else if (d.getSide() == Direction.Side.east && i + 1 <= 7 && movingFittings[i + 1][j] != null) {
+                            } else if (d.getSide() == Direction.Side.east && i + 1 < 7 && movingFittings[i + 1][j] != null) {
                                 for (Direction d2 : movingFittings[i + 1][j].getDirections()) {
                                     if (d2.getSide() == Direction.Side.west) {
                                         box--;
@@ -170,7 +170,7 @@ public class Controller {
         mainCanvas.getGraphicsContext2D().strokePolygon(new double[]{50, 50, 370, 370}, new double[]{50, 370, 370, 50}, 4);
     }
 
-    private void showMenu() throws InterruptedException {
+    private void showMenu() {
         popUpWindow();
         if (game.nextLevel()) {
             mainCanvas.getGraphicsContext2D().fillText("Kliknij aby rozpocząć.", 65, 300);
@@ -184,16 +184,20 @@ public class Controller {
     }
 
     private void drawLines() {
-        mainCanvas.getGraphicsContext2D().setStroke(Color.GRAY);
-        for (int i = 0; i < 41; i++) {
-            for (int j = 1; j < 7; j++) {
-                mainCanvas.getGraphicsContext2D().strokeLine(10 * i, 60 * j, 10 * i + 5, 60 * j);
-            }
-        }
-        for (int i = 0; i < 41; i++) {
-            for (int j = 1; j < 7; j++) {
-                mainCanvas.getGraphicsContext2D().strokeLine(60 * j, 10 * i, 60 * j, 10 * i + 5);
-            }
+        mainCanvas.getGraphicsContext2D().setStroke(Color.LIGHTGRAY);
+//        for (int i = 0; i < 41; i++) {
+//            for (int j = 1; j < 7; j++) {
+//                mainCanvas.getGraphicsContext2D().strokeLine(10 * i, 60 * j, 10 * i + 5, 60 * j);
+//            }
+//        }
+//        for (int i = 0; i < 41; i++) {
+//            for (int j = 1; j < 7; j++) {
+//                mainCanvas.getGraphicsContext2D().strokeLine(60 * j, 10 * i, 60 * j, 10 * i + 5);
+//            }
+//        }
+        for (int i = 0; i <= 7; i++) {
+            mainCanvas.getGraphicsContext2D().strokeLine(0, 60 * i, 420, 60 * i);
+            mainCanvas.getGraphicsContext2D().strokeLine(60 * i, 0, 60 * i, 420);
         }
     }
 
@@ -205,7 +209,7 @@ public class Controller {
     }
 
     @FXML
-    public void nextLevel() {
+    private void nextLevel() {
         mainCanvas.getGraphicsContext2D().clearRect(0, 0, mainCanvas.getWidth(), mainCanvas.getHeight());
         drawLines();
         gameOn = true;
@@ -226,13 +230,13 @@ public class Controller {
     }
 
     private void time() {
-        Service<Void> t = new Service<Void>() {
+        Service<Void> t = new Service<>() {
             @Override
             protected Task<Void> createTask() {
-                return new Task<Void>() {
+                return new Task<>() {
 
                     @Override
-                    protected Void call() throws Exception {
+                    protected Void call() {
                         int t = game.getLevels()[game.getCurrentLevel()].getTimer() * 10;
                         int x = t;
                         while (t > 0 && gameOn) {
@@ -243,7 +247,7 @@ public class Controller {
                                 t--;
 
                             } catch (InterruptedException e) {
-
+                                System.out.println("Error");
                             }
                         }
                         if (t <= 0) {
@@ -268,6 +272,7 @@ public class Controller {
 
     @FXML
     private void text() {
+        gameOver = true;
         popUpWindow();
         mainCanvas.getGraphicsContext2D().fillText("Gra \"Gazownik\" - wersja 1.0", 65, 75);
         mainCanvas.getGraphicsContext2D().fillText("Gra wykonana w ramach pracy dyplomowej", 65, 95);
@@ -277,12 +282,13 @@ public class Controller {
         mainCanvas.getGraphicsContext2D().fillText("Autor programu - Paweł Jarco", 65, 175);
         mainCanvas.getGraphicsContext2D().fillText("Promotor pracy - Krzysztof Węzowski", 65, 195);
         mainCanvas.getGraphicsContext2D().fillText("Grafika - Katarzyna Jarco", 65, 215);
-        mainCanvas.getGraphicsContext2D().fillText("Zasady gry:", 65, 250);
-        mainCanvas.getGraphicsContext2D().fillText("Klikając wybieramy kształtkę, którą chcemy", 65, 270);
-        mainCanvas.getGraphicsContext2D().fillText("przesunąć. Kolejnym klinięciem wybieramy", 65, 290);
-        mainCanvas.getGraphicsContext2D().fillText("miejsce, w którym chcemy umieścić kształtkę.", 65, 310);
-        mainCanvas.getGraphicsContext2D().fillText("Podwójnym kliknięciem obracamy kształtkę.", 65, 330);
-        mainCanvas.getGraphicsContext2D().fillText("Należy wykorzystać wszystkie kształtki.", 65, 350);
+        mainCanvas.getGraphicsContext2D().fillText("Zasady gry:", 65, 240);
+        mainCanvas.getGraphicsContext2D().fillText("Klikając wybieramy kształtkę, którą chcemy", 65, 260);
+        mainCanvas.getGraphicsContext2D().fillText("przesunąć. Kolejnym klinięciem wybieramy", 65, 280);
+        mainCanvas.getGraphicsContext2D().fillText("miejsce, w którym chcemy umieścić kształtkę.", 65, 300);
+        mainCanvas.getGraphicsContext2D().fillText("Podwójnym kliknięciem obracamy kształtkę.", 65, 320);
+        mainCanvas.getGraphicsContext2D().fillText("Należy wykorzystać wszystkie kształtki.", 65, 340);
+        mainCanvas.getGraphicsContext2D().fillText("Układ musi być szczelny.", 65, 360);
     }
 
     public void initialize() {
