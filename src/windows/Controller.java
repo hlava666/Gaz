@@ -16,8 +16,8 @@ public class Controller {
     private boolean movingFittingFromMainBoard = false;
     private boolean gameOn = false;
     private boolean gameOver = true;
-    private Fitting[][] movingFittings;
-    private Fitting temp = null;
+    private Fitting[][] fittingBoard;
+    private Fitting catchedFitting = null;
     private DrawHandler drawHandler = new DrawHandler(this);
 
     @FXML
@@ -31,6 +31,10 @@ public class Controller {
 
     @FXML
     private ProgressBar bar;
+
+    public static final double STEP_SIZE = 60;
+
+    public static final int BOARD_SIZE = 7;
 
     // ==============SETTERS==============
 
@@ -46,12 +50,12 @@ public class Controller {
         this.movingFittingFromMainBoard = moveFit;
     }
 
-    public void setTemp(Fitting temp) {
-        this.temp = temp;
+    public void setCatchedFitting(Fitting catchedFitting) {
+        this.catchedFitting = catchedFitting;
     }
 
     public void setMovingFittingsElement(int row, int column, Fitting fitting) {
-        movingFittings[row][column] = fitting;
+        fittingBoard[row][column] = fitting;
     }
 
     // ==============GETTERS==============
@@ -64,12 +68,12 @@ public class Controller {
         return game;
     }
 
-    public Fitting[][] getMovingFittings() {
-        return movingFittings;
+    public Fitting[][] getFittingBoard() {
+        return fittingBoard;
     }
 
-    public Fitting getTemp() {
-        return temp;
+    public Fitting getCatchedFitting() {
+        return catchedFitting;
     }
 
     public Canvas getMainCanvas() {
@@ -87,30 +91,25 @@ public class Controller {
         game = new Game();
         gameOver = false;
         nextLevel();
-        time();
+        startTimer();
     }
 
     @FXML
     public void mouseClick(MouseEvent event) {
-        MouseHandler mouseHandler = new MouseHandler(event);
+        MouseHandler mouseHandler = new MouseHandler(event, this);
         if (!gameOn && !gameOver) {
-            mouseHandler.startGame(this);
+            mouseHandler.startGame();
         } else {
-            if (event.getClickCount() == 2 && event.getSceneX() > sidePane.getWidth()
-                    && event.getSceneX() < sidePane.getWidth() + mainCanvas.getWidth() && gameOn) {
-                mouseHandler.rotateFitting(this);
-            } else if (event.getSceneX() > sidePane.getWidth() + mainCanvas.getWidth() && event.getX() < 120 && event.getY() > 0
-                    && event.getY() < mainCanvas.getHeight() && gameOn) {
-                mouseHandler.chooseFittingFromSide(this);
-            } else if (temp == null && event.getSceneX() > sidePane.getWidth() && event.getSceneX() < sidePane.getWidth() + mainCanvas.getWidth()
-                    && event.getY() > 0 && event.getY() < mainCanvas.getHeight() && gameOn) {
-                mouseHandler.chooseFittingFromMainBoard(this);
-            } else if (temp != null && event.getSceneX() > sidePane.getWidth() && event.getSceneX() < sidePane.getWidth() + mainCanvas.getWidth()
-                    && gameOn && !movingFittingFromMainBoard) {
-                mouseHandler.placeFittingFromSide(this);
-            } else if (temp != null && event.getSceneX() > sidePane.getWidth() && event.getSceneX() < sidePane.getWidth() + mainCanvas.getWidth()
-                    && gameOn && movingFittingFromMainBoard) {
-                mouseHandler.placeFittingFromMainBoard(this);
+            if (doubleClickedOnMainBoard(event)) {
+                mouseHandler.rotateFitting();
+            } else if (clickedOnSideBoard(event)) {
+                mouseHandler.chooseFittingFromSide();
+            } else if (clickedOnMainBoardWithoutFitting(event)) {
+                mouseHandler.chooseFittingFromMainBoard();
+            } else if (clickedOnMainBoardWithFittingFromSide(event)) {
+                mouseHandler.placeFittingFromSide();
+            } else if (clickedOnMainBoardWithFittingFromMainBoard(event)) {
+                mouseHandler.placeFittingFromMainBoard();
             }
         }
     }
@@ -120,27 +119,17 @@ public class Controller {
         mainCanvas.getGraphicsContext2D().clearRect(0, 0, mainCanvas.getWidth(), mainCanvas.getHeight());
         drawHandler.drawLines();
         gameOn = true;
-        movingFittings = new Fitting[7][7];
-        movingFittings[(int) (game.getLevels()[game.getCurrentLevel()].getBegining().getX() / 60)]
-                [(int) (game.getLevels()[game.getCurrentLevel()].getBegining().getY() / 60)]
-                = game.getLevels()[game.getCurrentLevel()].getBegining();
-        for (End e : game.getLevels()[game.getCurrentLevel()].getEnd()) {
-            movingFittings[(int) (e.getX() / 60)][(int) (e.getY() / 60)] = e;
-        }
+        createFittingBoard();
         drawHandler.drawFittingsOnSide();
-        game.getLevels()[game.getCurrentLevel()].getBegining().draw(mainCanvas, game.getLevels()[game.getCurrentLevel()].getBegining().getX(),
-                game.getLevels()[game.getCurrentLevel()].getBegining().getY());
-        for (End e : game.getLevels()[game.getCurrentLevel()].getEnd()) {
-            e.draw(mainCanvas, e.getX(), e.getY());
-        }
-        time();
+        drawHandler.drawStartAndEndOnMainBoard();
+        startTimer();
     }
 
     @FXML
     private void text() {
         gameOver = true;
         drawHandler.popUpWindow();
-        mainCanvas.getGraphicsContext2D().fillText("Gra \"Gazownik\" - wersja 1.0", 65, 75);
+        mainCanvas.getGraphicsContext2D().fillText("Gra \"Gazownik\" - wersja 1.1", 65, 75);
         mainCanvas.getGraphicsContext2D().fillText("Gra wykonana w ramach pracy dyplomowej", 65, 95);
         mainCanvas.getGraphicsContext2D().fillText("na studiów podyplomowych na WWSIS", 65, 115);
         mainCanvas.getGraphicsContext2D().fillText("na kieruneku Inżynieria Oprogramowania", 65, 135);
@@ -162,9 +151,9 @@ public class Controller {
         System.exit(0);
     }
 
-    // ==============OTHERS METHODS==============
+    // ==============HELPERS==============
 
-    private void time() {
+    private void startTimer() {
         Service<Void> t = new Service<>() {
             @Override
             protected Task<Void> createTask() {
@@ -202,41 +191,75 @@ public class Controller {
         if (!game.getLevels()[game.getCurrentLevel()].getFittings().isEmpty()) {
             return false;
         } else {
-            for (int j = 0; j < 7; j++) {
-                for (int i = 0; i < 7; i++) {
-                    if (movingFittings[i][j] != null) {
-                        int box = movingFittings[i][j].getDirections().length;
-                        for (Direction d : movingFittings[i][j].getDirections()) {
-                            if (d.getSide() == Direction.Side.north && j - 1 >= 0 && movingFittings[i][j - 1] != null) {
-                                for (Direction d2 : movingFittings[i][j - 1].getDirections()) {
-                                    if (d2.getSide() == Direction.Side.south) {
-                                        box--;
-                                    }
-                                }
-                            } else if (d.getSide() == Direction.Side.south && j + 1 < 7 && movingFittings[i][j + 1] != null) {
-                                for (Direction d2 : movingFittings[i][j + 1].getDirections()) {
-                                    if (d2.getSide() == Direction.Side.north) {
-                                        box--;
-                                    }
-                                }
-                            } else if (d.getSide() == Direction.Side.west && i - 1 >= 0 && movingFittings[i - 1][j] != null) {
-                                for (Direction d2 : movingFittings[i - 1][j].getDirections()) {
-                                    if (d2.getSide() == Direction.Side.east) {
-                                        box--;
-                                    }
-                                }
-                            } else if (d.getSide() == Direction.Side.east && i + 1 < 7 && movingFittings[i + 1][j] != null) {
-                                for (Direction d2 : movingFittings[i + 1][j].getDirections()) {
-                                    if (d2.getSide() == Direction.Side.west) {
-                                        box--;
-                                    }
-                                }
-                            }
-                        }
-                        if (box != 0) {
-                            return false;
-                        }
-                    }
+            return checkAllFields();
+        }
+    }
+
+    private boolean isFittingCatched(){
+        return (catchedFitting != null);
+    }
+
+    private boolean doubleClickedOnMainBoard(MouseEvent event) {
+        return (event.getClickCount() == 2 && event.getSceneX() > sidePane.getWidth() && event.getSceneX() < sidePane.getWidth() + mainCanvas.getWidth() && gameOn);
+    }
+
+    private boolean clickedOnSideBoard(MouseEvent event) {
+        return (event.getSceneX() > sidePane.getWidth() + mainCanvas.getWidth() && event.getX() < sideCanvas.getWidth() && event.getY() > 0
+                && event.getY() < sideCanvas.getHeight() && gameOn);
+    }
+
+    private boolean clickedOnMainBoardWithoutFitting(MouseEvent event) {
+        return (!isFittingCatched() && event.getSceneX() > sidePane.getWidth() && event.getSceneX() < sidePane.getWidth() + mainCanvas.getWidth()
+                && event.getY() > 0 && event.getY() < mainCanvas.getHeight() && gameOn);
+    }
+
+    private boolean clickedOnMainBoardWithFittingFromSide(MouseEvent event) {
+        return (isFittingCatched() && event.getSceneX() > sidePane.getWidth() && event.getSceneX() < sidePane.getWidth() + mainCanvas.getWidth()
+                && gameOn && !movingFittingFromMainBoard);
+    }
+
+    private boolean clickedOnMainBoardWithFittingFromMainBoard(MouseEvent event){
+        return(isFittingCatched() && event.getSceneX() > sidePane.getWidth() && event.getSceneX() < sidePane.getWidth() + mainCanvas.getWidth()
+                && gameOn && movingFittingFromMainBoard);
+    }
+
+    private void createFittingBoard(){
+        fittingBoard = new Fitting[BOARD_SIZE][BOARD_SIZE];
+        fittingBoard[(int) (game.getLevels()[game.getCurrentLevel()].getBeginning().getX() / STEP_SIZE)]
+                [(int) (game.getLevels()[game.getCurrentLevel()].getBeginning().getY() / STEP_SIZE)]
+                = game.getLevels()[game.getCurrentLevel()].getBeginning();
+        for (End e : game.getLevels()[game.getCurrentLevel()].getEnd()) {
+            fittingBoard[(int) (e.getX() / STEP_SIZE)][(int) (e.getY() / STEP_SIZE)] = e;
+        }
+    }
+
+    private boolean verifyAllDirection(int i, int j, int box) {
+        for (Direction d : fittingBoard[i][j].getDirections()) {
+            if (d.getSide() == Direction.Side.north && j - 1 >= 0 && fittingBoard[i][j - 1] != null) {
+                box += fittingBoard[i][j - 1].isConectedFromNorth();
+            } else if (d.getSide() == Direction.Side.south && j + 1 < 7 && fittingBoard[i][j + 1] != null) {
+                box += fittingBoard[i][j + 1].isConectedFromSouth();
+            } else if (d.getSide() == Direction.Side.west && i - 1 >= 0 && fittingBoard[i - 1][j] != null) {
+                box += fittingBoard[i - 1][j].isConectedFromWest();
+            } else if (d.getSide() == Direction.Side.east && i + 1 < 7 && fittingBoard[i + 1][j] != null) {
+                box += fittingBoard[i + 1][j].isConectedFromEast();
+            }
+        }
+        return box == 0;
+    }
+
+    private boolean isFieldHermetic(int i, int j) {
+        if (fittingBoard[i][j] != null) {
+            int box = fittingBoard[i][j].getDirections().length;
+            return verifyAllDirection(i, j, box);
+        } else return true;
+    }
+
+    private boolean checkAllFields(){
+        for (int j = 0; j < BOARD_SIZE; j++) {
+            for (int i = 0; i < BOARD_SIZE; i++) {
+                if (!isFieldHermetic(i, j)){
+                    return false;
                 }
             }
         }

@@ -2,11 +2,12 @@ package logic;
 
 public class Direction {
     public enum Side {
-        north, south, east, west;
+        north, south, east, west
     }
+
     private Side side;
 
-    public Direction(Side side) {
+    Direction(Side side) {
         this.side = side;
     }
 
@@ -14,8 +15,7 @@ public class Direction {
         return side;
     }
 
-    public void setSide(Side side) {
+    void setSide(Side side) {
         this.side = side;
     }
-
 }

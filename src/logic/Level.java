@@ -6,13 +6,13 @@ import java.util.List;
 public class Level {
     private List<Fitting> fittings;
     private int time;
-    private Begining begining;
+    private Beginning beginning;
     private End[] end;
 
-    Level(int time, Begining begining, End[] end) {
+    Level(int time, Beginning beginning, End[] end) {
         this.fittings = new ArrayList<>();
         this.time = time;
-        this.begining = begining;
+        this.beginning = beginning;
         this.end = end;
     }
 
@@ -24,8 +24,8 @@ public class Level {
         return time;
     }
 
-    public Begining getBegining() {
-        return begining;
+    public Beginning getBeginning() {
+        return beginning;
     }
 
     public End[] getEnd() {

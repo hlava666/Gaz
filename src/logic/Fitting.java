@@ -4,20 +4,21 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import windows.Controller;
 
 public abstract class Fitting {
     Direction[] directions;
     Image image;
     double x;
     double y;
-    private double imageSize = 60;
+    private double imageSize = Controller.STEP_SIZE;
 
     Fitting(int iloscOdgalezien) {
         this.directions = new Direction[iloscOdgalezien];
     }
 
 
-    public void rotate(Canvas canvas) {
+    void rotate(Canvas canvas) {
         for (Direction k : this.directions) {
             if (k.getSide() == Direction.Side.north)
                 k.setSide(Direction.Side.east);
@@ -35,7 +36,7 @@ public abstract class Fitting {
         gc.drawImage(image, x, y, imageSize, imageSize);
     }
 
-    public void draw(Canvas canvas, double x, double y) {
+    void draw(Canvas canvas, double x, double y) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         this.x = x - x % imageSize;
         this.y = y - y % imageSize;
@@ -50,11 +51,45 @@ public abstract class Fitting {
         return y;
     }
 
-    public double getImageSize() {
-        return imageSize;
-    }
-
     public Direction[] getDirections() {
         return directions;
     }
+
+    public int isConectedFromNorth(){
+        for (Direction direction : directions){
+            if (direction.getSide() == Direction.Side.south){
+                return -1;
+            }
+        }
+        return 0;
+    }
+
+    public int isConectedFromSouth(){
+        for (Direction direction : directions){
+            if (direction.getSide() == Direction.Side.north){
+                return -1;
+            }
+        }
+        return 0;
+    }
+
+    public int isConectedFromWest(){
+        for (Direction direction : directions){
+            if (direction.getSide() == Direction.Side.east){
+                return -1;
+            }
+        }
+        return 0;
+    }
+
+    public int isConectedFromEast(){
+        for (Direction direction : directions){
+            if (direction.getSide() == Direction.Side.west){
+                return -1;
+            }
+        }
+        return 0;
+    }
+
 }
+

@@ -4,8 +4,8 @@ import javafx.scene.image.Image;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-public class Begining extends Fitting{
-    Begining(Direction.Side side, double x, double y) throws FileNotFoundException {
+public class Beginning extends Fitting{
+    Beginning(Direction.Side side, double x, double y) throws FileNotFoundException {
         super(1);
         this.directions[0] = new Direction(side);
         this.x = x;

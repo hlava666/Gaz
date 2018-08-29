@@ -9,12 +9,12 @@ public class Game {
 
     public Game() throws FileNotFoundException {
         this.levels = new Level[3];
-        levels[0] = new Level(30, new Begining(Direction.Side.east, 60, 0), new End[] {new End(Direction.Side.north, 180, 180)});
+        levels[0] = new Level(30, new Beginning(Direction.Side.east, 60, 0), new End[] {new End(Direction.Side.north, 180, 180)});
         levels[0].getFittings().add(new Pipe());
         levels[0].getFittings().add(new Pipe());
         levels[0].getFittings().add(new Pipe());
         levels[0].getFittings().add(new Elbow());
-        levels[1] = new Level(40, new Begining(Direction.Side.west, 240, 0), new End[] {new End(Direction.Side.east, 60, 180)});
+        levels[1] = new Level(40, new Beginning(Direction.Side.west, 240, 0), new End[] {new End(Direction.Side.east, 60, 180)});
         levels[1].getFittings().add(new Pipe());
         levels[1].getFittings().add(new Elbow());
         levels[1].getFittings().add(new Elbow());
@@ -22,7 +22,7 @@ public class Game {
         levels[1].getFittings().add(new Elbow());
         levels[1].getFittings().add(new Tee());
         levels[1].getFittings().add(new Tee());
-        levels[2] = new Level(40, new Begining(Direction.Side.south, 120, 60), new End[] {new End(Direction.Side.east, 60, 300),
+        levels[2] = new Level(40, new Beginning(Direction.Side.south, 120, 60), new End[] {new End(Direction.Side.east, 60, 300),
         new End(Direction.Side.west, 300,180), new End(Direction.Side.west, 300,240)});
         levels[2].getFittings().add(new Pipe());
         levels[2].getFittings().add(new Pipe());
