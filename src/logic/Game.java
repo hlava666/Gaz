@@ -14,7 +14,7 @@ public class Game {
         levels[0].getFittings().add(new Pipe());
         levels[0].getFittings().add(new Pipe());
         levels[0].getFittings().add(new Elbow());
-        levels[1] = new Level(40, new Beginning(Direction.Side.west, 240, 0), new End[] {new End(Direction.Side.east, 60, 180)});
+        levels[1] = new Level(100, new Beginning(Direction.Side.west, 240, 0), new End[] {new End(Direction.Side.east, 60, 180)});
         levels[1].getFittings().add(new Pipe());
         levels[1].getFittings().add(new Elbow());
         levels[1].getFittings().add(new Elbow());

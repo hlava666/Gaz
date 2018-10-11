@@ -233,19 +233,19 @@ public class Controller {
         }
     }
 
-    private boolean verifyAllDirection(int i, int j, int box) {
+    private boolean verifyAllDirection(int i, int j, int numberOfOutlets) {
         for (Direction d : fittingBoard[i][j].getDirections()) {
             if (d.getSide() == Direction.Side.north && j - 1 >= 0 && fittingBoard[i][j - 1] != null) {
-                box += fittingBoard[i][j - 1].isConectedFromNorth();
+                numberOfOutlets += fittingBoard[i][j - 1].isConectedFromNorth();
             } else if (d.getSide() == Direction.Side.south && j + 1 < 7 && fittingBoard[i][j + 1] != null) {
-                box += fittingBoard[i][j + 1].isConectedFromSouth();
+                numberOfOutlets += fittingBoard[i][j + 1].isConectedFromSouth();
             } else if (d.getSide() == Direction.Side.west && i - 1 >= 0 && fittingBoard[i - 1][j] != null) {
-                box += fittingBoard[i - 1][j].isConectedFromWest();
+                numberOfOutlets += fittingBoard[i - 1][j].isConectedFromWest();
             } else if (d.getSide() == Direction.Side.east && i + 1 < 7 && fittingBoard[i + 1][j] != null) {
-                box += fittingBoard[i + 1][j].isConectedFromEast();
+                numberOfOutlets += fittingBoard[i + 1][j].isConectedFromEast();
             }
         }
-        return box == 0;
+        return numberOfOutlets == 0;
     }
 
     private boolean isFieldHermetic(int i, int j) {

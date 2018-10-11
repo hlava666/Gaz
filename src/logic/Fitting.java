@@ -13,8 +13,8 @@ public abstract class Fitting {
     double y;
     private double imageSize = Controller.STEP_SIZE;
 
-    Fitting(int iloscOdgalezien) {
-        this.directions = new Direction[iloscOdgalezien];
+    Fitting(int numberOfOutlets) {
+        this.directions = new Direction[numberOfOutlets];
     }
 
 
