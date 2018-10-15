@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Gazownik:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Gazownik_jar</output-path>
+    <root id="archive" name="Gazownik.jar">
+      <element id="module-output" name="Gazownik" />
+    </root>
+  </artifact>
+</component>
