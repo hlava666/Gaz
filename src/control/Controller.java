@@ -158,14 +158,10 @@ public class Controller {
     // ==============HELPERS==============
 
     private void startTimer() {
-        Service<Void> t = new Service<>() {
+        Thread t = new Thread(){
             @Override
-            protected Task<Void> createTask() {
-                return new Task<>() {
-
-                    @Override
-                    protected Void call() {
-                        int t = game.getLevels()[game.getCurrentLevel()].getTimer() * 10;
+            public void run() {
+                int t = game.getLevels()[game.getCurrentLevel()].getTimer() * 10;
                         int x = t;
                         while (t > 0 && gameOn) {
                             try {
@@ -183,9 +179,6 @@ public class Controller {
                             mainCanvas.getGraphicsContext2D().fillText("Niestety koniec czasu.", 105, 200);
                             gameOn = false;
                         }
-                        return null;
-                    }
-                };
             }
         };
         t.start();
