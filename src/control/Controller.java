@@ -95,7 +95,6 @@ public class Controller {
         game = new Game();
         gameOver = false;
         nextLevel();
-        startTimer();
     }
 
     @FXML
